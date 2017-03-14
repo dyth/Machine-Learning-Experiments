@@ -3,63 +3,93 @@
 import random
 from matplotlib import pyplot
 
-def createData(n):
-    """build a binary separable space of 0 = x - y"""
-    xlist, ylist, zlist = [], [], []
-    for i in range(n):
-        x, y = random.random(), random.random()
-        z = x - y # the threshold
-        xlist.append(x)
-        ylist.append(y)
-        zlist.append(z)
-    return xlist, ylist, zlist
+def createDatapoints(samples):
+    'return randomly generated sample points'
+    dimension = [random.random() for _ in range(samples)]
+    return dimension
 
 
-def plotData(xlist, ylist, zlist):
-    """plot binary separable space"""
-    x_yes, y_yes, z_yes, x_no, y_no, z_no, zreal = [], [], [], [], [], [], []
-    for i in range(n):
-        x, y, z = xlist[i], ylist[i], zlist[i] # z is the threshold
-        if z > 0:
+def createData(samples, dimensionality):
+    'return list of len(samples) with <dimensionality>, as well as threshold'
+    # currently binary separable along 0 = x - y
+    datapoints = [createDatapoints(samples) for _ in range(dimensionality)]
+    # zList is a threshold determining magnitude of classification
+    thresholds = [datapoints[0][i] - datapoints[1][i] for i in range(samples)]
+    return datapoints, thresholds
+
+
+def plotData(samples, datapoints, dimensionality):
+    'plot binary separable space'
+    # split data depending on where it is classified
+    # in this example, still binary
+    yes = [[] for _ in range(dimensionality)]
+    no = [[] for _ in range(dimensionality)]
+    
+    for i in range(datapoints):
+        x = xList[i]
+        y = yList[i]
+        if (zList[i] > 0):
+            
+            #[yes[d].append(x[i]) for d in range(dimensionality)]
+            
             x_yes.append(x)
             y_yes.append(y)
-            z_yes.append(z)
-            zreal.append(1)
         else:
             x_no.append(x)
             y_no.append(y)
-            z_no.append(z)
-            zreal.append(-1)
-    pyplot.xlim([0, 1]) # x-axis limits
-    pyplot.ylim([0, 1]) # y-axis limits
+
+    # set bound on range of x and y axes, then plot data
+    pyplot.xlim([0, 1])
+    pyplot.ylim([0, 1])
     pyplot.scatter(x_yes, y_yes, marker="o", color="g")
     pyplot.scatter(x_no, y_no, marker="o", color="r")
-    pyplot.ion()  # pyplot interactive mode on
-    pyplot.show() # create window
+    
     lineplot, = pyplot.plot([], [], color="k") # straight line plot
     return lineplot
 
     
-def train(x, y, z, a, b, c, lineplot):
+def train(x, y, z, a, b, c):
     """train on paramenters a, b, c, Separation line: 0 = a*x + b*y + c"""
     h = a*x + b*y + c - z # hypothesis -- difference in value
     a -= h*x
     b -= h*y
     c -= h
-    # draw the straight line graph for every iteration
-    lineplot.set_xdata([0,1])
-    lineplot.set_ydata([-c/b,(-c-a)/b])
-    pyplot.title(str(i)+" "+str(a)+" "+str(b)+" "+str(c))
-    pyplot.pause(0.1) # pause between each update of training
+    return a, b, c
+
+
+def update(lineplot, i, a, b, c):
+    'update line on graph'
+    lineplot.set_xdata([0, 1])
+    lineplot.set_ydata([-c / b, (-c - a) / b])
+    pyplot.title(str(i) + " " + str(a) + " " + str(b) + " " + str(c))
     return a, b, c
 
     
-n = 100
-xlist, ylist, zlist = createData(n)
-lineplot = plotData(xlist, ylist, zlist)
-a, b, c = random.random(), random.random(), random.random()
-# taken new data point, adjust a, b and c.
-for i in range(n):
-    x, y, z = xlist[i], ylist[i], zlist[i]
-    a, b, c = train(x, y, z, a, b, c, lineplot)
+samples = 100
+dimensionality = 2
+datapoints, thresholds = createData(samples, dimensionality)
+
+
+
+quit()
+
+# initialise lineplot, turn pyplot interactive mode on and create window
+lineplot = plotData(xList, yList, zList, samples, dimensionality)
+pyplot.ion()
+pyplot.show()
+
+# initialise random values of starting point
+a = random.random()
+b = random.random()
+c = random.random()
+
+for i in range(samples):
+    # train values of a, b and c on a new datapoint
+    x, y, z = xList[i], yList[i], zList[i]
+    a, b, c = train(x, y, z, a, b, c)
+    # pause between each update of training before updating graph
+    pyplot.pause(0.1)
+    update(lineplot, i, a, b, c)
+
+# leave final trained perceptron on screen before quitting
 raw_input("Complete. Press RETURN to quit")

@@ -55,3 +55,4 @@ def csvToList(filename):
 
 createData(100, 'twoToThree.csv')
 points = csvToList('twoToThree.csv')
+print points
