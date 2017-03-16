@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """create binary seperable space and train perceptron"""
 import random
+from perceptron import perceptron
 from matplotlib import pyplot
 
 def randomList(samples):
@@ -43,25 +44,10 @@ def plotData(yes, no):
     return lineplot
 
 
-def error(datapoint, threshold, weights, dimensionality):
-    'create linear hypothesis between datapoint and weights'
-    hypothesis = weights[-1] - threshold
-    for i in range(dimensionality):
-        hypothesis += datapoint[i] * weights[i]
-    return hypothesis
-
-
-def train(datapoint, hypothesis, weights, dimensionality):
-    'alter weight depending on datapoint'
-    for i in range(dimensionality):
-        weights[i] -= hypothesis * datapoint[i]
-    weights[-1] -= hypothesis
-    return weights
- 
-
-def update(lineplot, i, weights):
+def update(lineplot, i, weights, bias):
     'update line on graph'
-    a, b, c = weights
+    a, b = weights
+    c = bias
     lineplot.set_xdata([0, 1])
     lineplot.set_ydata([-c / b, (-c - a) / b])
     pyplot.title(str(i) + " " + str(a) + " " + str(b) + " " + str(c))
@@ -72,29 +58,27 @@ def update(lineplot, i, weights):
 samples = 100
 dimensionality = 2
 
-# create data
+# create data, separate data into categories
 datapoints, thresholds = createData(samples, dimensionality)
-
-# separate data and initialise lineplot
 yes, no = separateData(samples, datapoints, thresholds, dimensionality)
-lineplot = plotData(yes, no)
 
-# turn pyplot interactive mode on and create window
+# turn pyplot interactive mode on, create window and initialise lineplot
 pyplot.ion()
 pyplot.show()
+lineplot = plotData(yes, no)
 
-# initialise random values of starting point
-weights = randomList(dimensionality + 1)
+# initialise perceptron
+perceptron = perceptron(dimensionality)
 
 for i in range(samples):
     # train values of a, b and c on a new datapoint
     datapoint = [datapoints[d][i] for d in range(dimensionality)]
-    hypothesis = error(datapoint, thresholds[i], weights, dimensionality)
-    weights = train(datapoint, hypothesis, weights, dimensionality)
+    hypothesis = perceptron.error(datapoint, thresholds[i])
+    perceptron.train(datapoint, hypothesis)
     
     # pause between each update of training before updating graph
     pyplot.pause(0.1)
-    update(lineplot, i, weights)
+    update(lineplot, i, perceptron.weights, perceptron.bias)
 
 # leave final trained perceptron on screen before quitting
 raw_input("Complete. Press RETURN to quit")
