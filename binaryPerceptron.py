@@ -58,9 +58,12 @@ def update(lineplot, i, weights, bias):
 samples = 100
 dimensionality = 2
 
-# create data, separate data into categories
+# create training data, separate data into categories
 datapoints, thresholds = createData(samples, dimensionality)
 yes, no = separateData(samples, datapoints, thresholds, dimensionality)
+
+# create testing data
+testPoints, testThreshold = createData(samples / 10, dimensionality)
 
 # turn pyplot interactive mode on, create window and initialise lineplot
 pyplot.ion()
@@ -70,14 +73,18 @@ lineplot = plotData(yes, no)
 # initialise perceptron
 perceptron = perceptron(dimensionality)
 
+# train perceptron datapoint by datapoint
 for i in range(samples):
-    # train values of a, b and c on a new datapoint
     datapoint = [datapoints[d][i] for d in range(dimensionality)]
-    hypothesis = perceptron.error(datapoint, thresholds[i])
-    perceptron.train(datapoint, hypothesis)
+    perceptron.train(datapoint, thresholds[i])
+
+    # evaluate testing data
+    for i in range(len(testPoints)):
+        print perceptron.classify(testPoints[i]), testThreshold[i]
+
     
-    # pause between each update of training before updating graph
-    pyplot.pause(0.1)
+    # pause between each training cycle
+    pyplot.pause(0.05)
     update(lineplot, i, perceptron.weights, perceptron.bias)
 
 # leave final trained perceptron on screen before quitting
