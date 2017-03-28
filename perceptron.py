@@ -5,7 +5,7 @@ import random, math
 class perceptron:
     
     def __init__(self, dimensionality):
-        # create initial random weights and random bias
+        'create initial random weights and random bias'
         self.dimensionality = dimensionality
         self.weights = [random.random() for _ in range(dimensionality)]
         self.bias = random.random()
@@ -20,8 +20,8 @@ class perceptron:
     def adjust(self, datapoint, hypothesis):
         'adjust weight depending on datapoint'
         for i in range(self.dimensionality):
-            self.weights[i] -= hypothesis * datapoint[i]
-        self.bias -= hypothesis
+            self.weights[i] -= 0.01 * hypothesis * datapoint[i]
+        self.bias -= 0.01 * hypothesis
 
     def train(self, datapoint, threshold):
         'train by adjusting weights depending on hypothesis'

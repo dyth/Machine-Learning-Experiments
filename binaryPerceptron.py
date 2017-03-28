@@ -44,6 +44,17 @@ def plotData(yes, no):
     return lineplot
 
 
+def evaluate(testPoints, testThreshold, testSamples, dimensionality):
+    'evaluate accuracy of perceptron'
+    accuracy = 0.0
+    for i in range(testSamples):
+        testData = [testPoints[d][i] for d in range(dimensionality)]
+        if (perceptron.classify(testData)* testThreshold[i] > 0.0):
+            accuracy += 1.0
+    accuracy = 100.0 * (accuracy / testSamples)
+    return accuracy
+    
+    
 def update(lineplot, i, weights, bias):
     'update line on graph'
     a, b = weights
@@ -63,7 +74,8 @@ datapoints, thresholds = createData(samples, dimensionality)
 yes, no = separateData(samples, datapoints, thresholds, dimensionality)
 
 # create testing data
-testPoints, testThreshold = createData(samples / 10, dimensionality)
+testSamples = samples
+testPoints, testThreshold = createData(testSamples, dimensionality)
 
 # turn pyplot interactive mode on, create window and initialise lineplot
 pyplot.ion()
@@ -74,18 +86,18 @@ lineplot = plotData(yes, no)
 perceptron = perceptron(dimensionality)
 
 # train perceptron datapoint by datapoint
+history = []
 for i in range(samples):
     datapoint = [datapoints[d][i] for d in range(dimensionality)]
     perceptron.train(datapoint, thresholds[i])
 
-    # evaluate testing data
-    for i in range(len(testPoints)):
-        print perceptron.classify(testPoints[i]), testThreshold[i]
-
+    # evaluate accuracy of perceptron using testing data, then plot on graph
+    accuracy = evaluate(testPoints, testThreshold, testSamples, dimensionality)
+    history.append(accuracy)
     
-    # pause between each training cycle
+    # plot on graph with a pause
     pyplot.pause(0.05)
     update(lineplot, i, perceptron.weights, perceptron.bias)
-
+    
 # leave final trained perceptron on screen before quitting
 raw_input("Complete. Press RETURN to quit")
