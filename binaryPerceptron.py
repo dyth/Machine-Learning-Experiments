@@ -1,103 +1,65 @@
 #!/usr/bin/env python
 """create binary seperable space and train perceptron"""
 import random
-from perceptron import perceptron
 from matplotlib import pyplot
 
-def randomList(samples):
-    'return randomly generated sample points'
-    return [random.random() for _ in range(samples)]
+def createData(n):
+    """build a binary separable space of 0 = x - y"""
+    xlist, ylist, zlist = [], [], []
+    for i in range(n):
+        x, y = random.random(), random.random()
+        z = x - y # the threshold
+        xlist.append(x)
+        ylist.append(y)
+        zlist.append(z)
+    return xlist, ylist, zlist
 
 
-def createData(samples, dimensionality):
-    'return list of len(samples) with <dimensionality>, as well as threshold'
-    # currently binary separable along 0 = x - y
-    datapoints = [randomList(samples) for _ in range(dimensionality)]
-    # zList is a threshold determining magnitude of classification
-    thresholds = [datapoints[0][i] - datapoints[1][i] for i in range(samples)]
-    return datapoints, thresholds
-
-
-def separateData(samples, datapoints, thresholds, dimensionality):
-    'split data into classes yes and no depending on classification'
-    # in this example, it is still binary
-    yes = [[] for _ in range(dimensionality)]
-    no = [[] for _ in range(dimensionality)]
-    for i in range(samples):
-        if (thresholds[i] > 0):
-            [yes[d].append(datapoints[d][i]) for d in range(dimensionality)]
+def plotData(xlist, ylist, zlist):
+    """plot binary separable space"""
+    x_yes, y_yes, z_yes, x_no, y_no, z_no, zreal = [], [], [], [], [], [], []
+    for i in range(n):
+        x, y, z = xlist[i], ylist[i], zlist[i] # z is the threshold
+        if z > 0:
+            x_yes.append(x)
+            y_yes.append(y)
+            z_yes.append(z)
+            zreal.append(1)
         else:
-            [no[d].append(datapoints[d][i]) for d in range(dimensionality)]
-    return yes, no
-
-
-def plotData(yes, no):
-    'plot the lists yes and no within the same axes'
-    # set bound on range of x and y axes
-    pyplot.xlim([0, 1])
-    pyplot.ylim([0, 1])
-    # plot data
-    pyplot.scatter(yes[0], yes[1], marker="o", color="g")
-    pyplot.scatter(no[0], no[1], marker="o", color="r")
-    # return a straight line plot within the data
-    lineplot, = pyplot.plot([], [], color="k")
+            x_no.append(x)
+            y_no.append(y)
+            z_no.append(z)
+            zreal.append(-1)
+    pyplot.xlim([0, 1]) # x-axis limits
+    pyplot.ylim([0, 1]) # y-axis limits
+    pyplot.scatter(x_yes, y_yes, marker="o", color="g")
+    pyplot.scatter(x_no, y_no, marker="o", color="r")
+    pyplot.ion()  # pyplot interactive mode on
+    pyplot.show() # create window
+    lineplot, = pyplot.plot([], [], color="k") # straight line plot
     return lineplot
 
-
-def evaluate(testPoints, testThreshold, testSamples, dimensionality):
-    'evaluate accuracy of perceptron'
-    accuracy = 0.0
-    for i in range(testSamples):
-        testData = [testPoints[d][i] for d in range(dimensionality)]
-        if (perceptron.classify(testData)* testThreshold[i] > 0.0):
-            accuracy += 1.0
-    accuracy = 100.0 * (accuracy / testSamples)
-    return accuracy
     
-    
-def update(lineplot, i, weights, bias):
-    'update line on graph'
-    a, b = weights
-    c = bias
-    lineplot.set_xdata([0, 1])
-    lineplot.set_ydata([-c / b, (-c - a) / b])
-    pyplot.title(str(i) + " " + str(a) + " " + str(b) + " " + str(c))
-
+def train(x, y, z, a, b, c, lineplot):
+    """train on paramenters a, b, c, Separation line: 0 = a*x + b*y + c"""
+    h = a*x + b*y + c - z # hypothesis -- difference in value
+    a -= h*x
+    b -= h*y
+    c -= h
+    # draw the straight line graph for every iteration
+    lineplot.set_xdata([0,1])
+    lineplot.set_ydata([-c/b,(-c-a)/b])
+    pyplot.title(str(i)+" "+str(a)+" "+str(b)+" "+str(c))
+    pyplot.pause(0.1) # pause between each update of training
+    return a, b, c
 
     
-# determine size and scale of problem
-samples = 100
-dimensionality = 2
-
-# create training data, separate data into categories
-datapoints, thresholds = createData(samples, dimensionality)
-yes, no = separateData(samples, datapoints, thresholds, dimensionality)
-
-# create testing data
-testSamples = samples
-testPoints, testThreshold = createData(testSamples, dimensionality)
-
-# turn pyplot interactive mode on, create window and initialise lineplot
-pyplot.ion()
-pyplot.show()
-lineplot = plotData(yes, no)
-
-# initialise perceptron
-perceptron = perceptron(dimensionality)
-
-# train perceptron datapoint by datapoint
-history = []
-for i in range(samples):
-    datapoint = [datapoints[d][i] for d in range(dimensionality)]
-    perceptron.train(datapoint, thresholds[i])
-
-    # evaluate accuracy of perceptron using testing data, then plot on graph
-    accuracy = evaluate(testPoints, testThreshold, testSamples, dimensionality)
-    history.append(accuracy)
-    
-    # plot on graph with a pause
-    pyplot.pause(0.05)
-    update(lineplot, i, perceptron.weights, perceptron.bias)
-    
-# leave final trained perceptron on screen before quitting
+n = 100
+xlist, ylist, zlist = createData(n)
+lineplot = plotData(xlist, ylist, zlist)
+a, b, c = random.random(), random.random(), random.random()
+# taken new data point, adjust a, b and c.
+for i in range(n):
+    x, y, z = xlist[i], ylist[i], zlist[i]
+    a, b, c = train(x, y, z, a, b, c, lineplot)
 raw_input("Complete. Press RETURN to quit")

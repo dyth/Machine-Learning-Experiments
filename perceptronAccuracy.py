@@ -26,7 +26,7 @@ class point:
         self.label = self.classifyData(self.position)
         
 
-        
+
 def createData(samples, dimensionality):
     'return list of len(samples) of points'
     return [point(dimensionality) for _ in range(samples)]
@@ -36,17 +36,20 @@ def evaluate(perceptron, testPoints, testSamples):
     'evaluate % accuracy of perceptron'
     accuracy = 0.0
     for point in testPoints:
-        if (perceptron.classify(point.position) * point.label > 0.0):
+        if (perceptron.predict(point.position) * point.label > 0.0):
             accuracy += 1.0
     return 100.0 * (accuracy / testSamples)
 
 
 
+# number of labels; dimensionality of datapoints; learning rate
+labels = 2
+dimensionality = 10
+learningRate = 0.2
+
 # determine size and scale of problem
 samples = 1000
 testSamples = max(100, samples / 10)
-dimensionality = 2
-learningRate = 0.2
 
 # create training and testing data
 datapoints = createData(samples, dimensionality)
