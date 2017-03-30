@@ -4,54 +4,63 @@ import random
 from perceptron import perceptron
 from matplotlib import pyplot
 
-def randomList(samples):
-    'return randomly generated sample points'
-    return [random.random() for _ in range(samples)]
+
+class point:
+
+    def randomList(self, n):
+        'return list of len(n) of randomly generated floats in range {0, 1}'
+        return [random.random() for _ in range(n)]
 
 
-def createData(samples, dimensionality):
-    'return list of len(samples) with <dimensionality>, as well as threshold'
-    # currently binary separable along 0 = x - y
-    datapoints = [randomList(samples) for _ in range(dimensionality)]
-    # zList is a threshold determining magnitude of classification
-    #thresholds = [datapoints[0][i] - datapoints[1][i] for i in range(samples)]
-    thresholds = [datapoints[0][i] - 0.5 for i in range(samples)]
-    return datapoints, thresholds
-
-
-def evaluate(perceptron, testPoints, testThreshold,
-                 testSamples, dimensionality):
-    'evaluate accuracy of perceptron'
-    accuracy = 0.0
-    for i in range(testSamples):
-        testData = [testPoints[d][i] for d in range(dimensionality)]
-        if (perceptron.classify(testData) * testThreshold[i] > 0.0):
-            accuracy += 1.0
-    accuracy = 100.0 * (accuracy / testSamples)
-    return accuracy
-
+    def classifyData(self, position):
+        'give class of data in the range of {0, range}'
+        # currently binary separable along 0 = x - y
+        # for now return magnitude
+        return position[0] - position[1]
     
+
+    def __init__(self, dimensionality):
+        'store position and coordinates'
+        self.position = self.randomList(dimensionality)
+        self.label = self.classifyData(self.position)
+        
+
+        
+def createData(samples, dimensionality):
+    'return list of len(samples) of points'
+    return [point(dimensionality) for _ in range(samples)]
+
+
+def evaluate(perceptron, testPoints, testSamples):
+    'evaluate % accuracy of perceptron'
+    accuracy = 0.0
+    for point in testPoints:
+        if (perceptron.classify(point.position) * point.label > 0.0):
+            accuracy += 1.0
+    return 100.0 * (accuracy / testSamples)
+
+
+
 # determine size and scale of problem
 samples = 1000
 testSamples = max(100, samples / 10)
-dimensionality = 3
+dimensionality = 10
+learningRate = 0.2
 
 # create training and testing data
-datapoints, thresholds = createData(samples, dimensionality)
-testPoints, testThreshold = createData(testSamples, dimensionality)
+datapoints = createData(samples, dimensionality)
+testPoints = createData(testSamples, dimensionality)
 
 # initialise perceptron
-perceptron = perceptron(dimensionality)
+perceptron = perceptron(dimensionality, learningRate)
 
 history = []
-for i in range(samples):
+for point in datapoints:
     # train perceptron one datapoint at a time
-    datapoint = [datapoints[d][i] for d in range(dimensionality)]
-    perceptron.train(datapoint, thresholds[i])
+    perceptron.train(point.position, point.label)
 
     # evaluate accuracy of perceptron using testing data, then append to history
-    accuracy = evaluate(perceptron, testPoints, testThreshold,
-                            testSamples, dimensionality)
+    accuracy = evaluate(perceptron, testPoints, testSamples)
     history.append(accuracy)
     
 # plot on graph

@@ -2,7 +2,7 @@
 """experiments in networks from two continous dimensions to multiple discrete"""
 import random, time, csv
 from matplotlib import pyplot
-import perceptron
+from perceptron import perceptron
 
 
 def createData(n, name):
