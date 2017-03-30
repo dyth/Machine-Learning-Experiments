@@ -3,7 +3,7 @@
 Implementations and experiments concerning core machine learning ideas.
 
 ## Creating training and testing data
-`createData.py` and `createData.pyc`: create data using the function
+`createData.py` create data using the function
 
 > createData(\<numberOfClasses\>, <\dimensionalityOfPoints\>, <\numberOfSamples\>)
 
