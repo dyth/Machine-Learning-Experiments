@@ -3,14 +3,6 @@
 import random, math
 
 class perceptron:
-    
-    def __init__(self, dimensionality, learningRate):
-        'create initial random weights and random bias'
-        self.learningRate = learningRate
-        self.dimensionality = dimensionality
-        self.weights = [random.random() for _ in range(dimensionality)]
-        self.bias = random.random()
-
 
     def activate(self, value):
         'activation function is sigmoidal'
@@ -37,3 +29,11 @@ class perceptron:
         'train by adjusting weights depending on hypothesis'
         hypothesis = self.error(datapoint, threshold)
         self.adjust(datapoint, hypothesis)
+
+            
+    def __init__(self, dimensionality, learningRate):
+        'create initial random weights and random bias'
+        self.learningRate = learningRate
+        self.dimensionality = dimensionality
+        self.weights = [random.random() for _ in range(dimensionality)]
+        self.bias = random.random()
