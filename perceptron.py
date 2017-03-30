@@ -11,12 +11,17 @@ class perceptron:
         self.weights = [random.random() for _ in range(dimensionality)]
         self.bias = random.random()
 
+
+    def activate(self, value):
+        'activation function is sigmoidal'
+        return math.tanh(value)
+        
     def error(self, datapoint, threshold):
         'create linear hypothesis between datapoint and weights'
-        hypothesis = self.bias - threshold
+        hypothesis = self.bias
         for i in range(self.dimensionality):
             hypothesis += datapoint[i] * self.weights[i]
-        return hypothesis
+        return self.activate(hypothesis) - threshold #self.activate(hypothesis)
 
     def adjust(self, datapoint, hypothesis):
         'adjust weight depending on datapoint'

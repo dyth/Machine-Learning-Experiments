@@ -11,14 +11,15 @@ class point:
         'return list of len(n) of randomly generated floats in range {0, 1}'
         return [random.random() for _ in range(n)]
 
-
     def classifyData(self, position):
         'give class of data in the range of {0, range}'
         # currently binary separable along 0 = x - y
         # for now return magnitude
-        return position[0] - position[1]
+        if (position[0] - position[1] > 0):
+            return 1.0
+        else:
+            return -1.0
     
-
     def __init__(self, dimensionality):
         'store position and coordinates'
         self.position = self.randomList(dimensionality)
@@ -44,7 +45,7 @@ def evaluate(perceptron, testPoints, testSamples):
 # determine size and scale of problem
 samples = 1000
 testSamples = max(100, samples / 10)
-dimensionality = 10
+dimensionality = 2
 learningRate = 0.2
 
 # create training and testing data
@@ -56,12 +57,9 @@ perceptron = perceptron(dimensionality, learningRate)
 
 history = []
 for point in datapoints:
-    # train perceptron one datapoint at a time
+    # train perceptron on a datapoint, then evaluate its accuracy
     perceptron.train(point.position, point.label)
-
-    # evaluate accuracy of perceptron using testing data, then append to history
-    accuracy = evaluate(perceptron, testPoints, testSamples)
-    history.append(accuracy)
+    history.append(evaluate(perceptron, testPoints, testSamples))
     
 # plot on graph
 pyplot.plot(history)
