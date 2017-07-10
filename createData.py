@@ -49,4 +49,5 @@ if __name__ == "__main__":
     samples = 10
 
     for point in createData(labels, dimensionality, samples):
-        print point.position, point.label
+        for p in point:
+            print p.position, p.label
